@@ -17,6 +17,8 @@ public class player_controller : MonoBehaviour
     private float movementX;
     private float movementY;
     private int count;
+
+    public bool cubeOnGround = true;
     
     // Start is called before the first frame update
     void Start()
@@ -32,6 +34,11 @@ public class player_controller : MonoBehaviour
     {
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
         rb.AddForce(movement * speed);
+        if (Input.GetButtonDown("Jump") && cubeOnGround)
+        {
+            rb.AddForce(new Vector3(0,6,0), ForceMode.Impulse);
+            cubeOnGround = false;
+        }
     }
     
     void OnMove(InputValue inputValue)
@@ -52,6 +59,11 @@ public class player_controller : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.CompareTag("DeathGround"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
         if (other.gameObject.CompareTag("PickUp"))
         {
             
@@ -59,6 +71,14 @@ public class player_controller : MonoBehaviour
             count = count + 1;
             SetCountText();
             SceneManager.LoadScene(0);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ground")
+        {
+            cubeOnGround = true;
         }
     }
 }
